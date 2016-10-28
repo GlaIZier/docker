@@ -28,7 +28,8 @@ RUN mkdir /docker-entrypoint-initdb.d
 RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 
 ENV PG_MAJOR 9.6
-ENV PG_VERSION 9.6.0-1.pgdg80+1
+# My. Removed minor version. Always install latest from repo
+#ENV PG_VERSION 9.6.0-1.pgdg80+1
 
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' $PG_MAJOR > /etc/apt/sources.list.d/pgdg.list
 
@@ -36,8 +37,8 @@ RUN apt-get update \
 	&& apt-get install -y postgresql-common \
 	&& sed -ri 's/#(create_main_cluster) .*$/\1 = false/' /etc/postgresql-common/createcluster.conf \
 	&& apt-get install -y \
-		postgresql-$PG_MAJOR=$PG_VERSION \
-		postgresql-contrib-$PG_MAJOR=$PG_VERSION \
+		postgresql-$PG_MAJOR \
+		postgresql-contrib-$PG_MAJOR \
 	&& rm -rf /var/lib/apt/lists/*
 
 # make the sample config easier to munge (and "correct by default")
@@ -52,7 +53,10 @@ ENV PGDATA /var/lib/postgresql/data
 VOLUME /var/lib/postgresql/data
 
 COPY docker-entrypoint.sh /
+# My. Make this script executable
 RUN chmod +x /docker-entrypoint.sh
+# My. Init scripts addition to the init folder inside container
+COPY init_scripts/create_powerlifter_db_role_postgres_script.sql /docker-entrypoint-initdb.d/ 
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
