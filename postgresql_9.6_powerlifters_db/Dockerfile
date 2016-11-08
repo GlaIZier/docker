@@ -55,8 +55,6 @@ VOLUME /var/lib/postgresql/data
 COPY docker-entrypoint.sh /
 # My. Make this script executable
 RUN chmod +x /docker-entrypoint.sh
-# My. Init scripts addition to the init folder inside container
-COPY init_scripts/create_powerlifter_db_role_postgres_script.sql /docker-entrypoint-initdb.d/ 
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
